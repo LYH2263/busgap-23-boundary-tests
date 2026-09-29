@@ -29,6 +29,8 @@ def detect_bunching(arrivals: list[dict], planned_headway_min: float, bunch_thre
         items = sorted(items, key=lambda x: x["actual_arrive"])
         for i in range(1, len(items)):
             prev, cur = items[i - 1], items[i]
+            if prev["trip_no"] == cur["trip_no"]:
+                continue  # 自班次不配：同一班次的相邻到点不构成间隔对
             gap_min = (cur["actual_arrive"] - prev["actual_arrive"]).total_seconds() / 60.0
             status, suggestion = classify_gap(gap_min, planned_headway_min, bunch_threshold, large_threshold)
             events.append(GapEvent(stop, prev["trip_no"], cur["trip_no"], round(gap_min, 2), planned_headway_min, status, suggestion))
